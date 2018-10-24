@@ -166,6 +166,13 @@ Parameters:
     Default: 30
     MinValue: 5
     MaxValue: 480
+  ServiceOrBatch:
+    Type: String
+    Description: Use service or batch deploy
+    Default: "svc"
+    AllowedValues:
+      - "svc"
+      - "batch"
 Conditions:
   IsS3:
     "Fn::And":
@@ -257,7 +264,7 @@ Resources:
               commands:
                 - curl -sL ${MuDownloadBaseurl}/v${MuDownloadVersion}/${MuDownloadFile} -o /usr/bin/mu
                 - chmod +rx /usr/bin/mu
-                - mu -c ${MuFile} svc push -k ${CodePipelineKeyArn}
+                - mu -c ${MuFile} ${ServiceOrBatch} push -k ${CodePipelineKeyArn}
           artifacts:
             files:
               - ${MuFile}
@@ -296,7 +303,7 @@ Resources:
                 - chmod +rx /usr/bin/mu
                 - mu -c ${MuFile} --assume-role ${MuAcptRoleArn} --disable-iam env up ${AcptEnv} 
                 - mu -c ${MuFile} --assume-role ${MuAcptRoleArn} --disable-iam db up ${AcptEnv} 
-                - mu -c ${MuFile} --assume-role ${MuAcptRoleArn} --disable-iam svc deploy ${AcptEnv}
+                - mu -c ${MuFile} --assume-role ${MuAcptRoleArn} --disable-iam ${ServiceOrBatch} deploy ${AcptEnv}
                 - mu -c ${MuFile} --assume-role ${MuAcptRoleArn} env show ${AcptEnv} -f json > env.json
                 - mu -c ${MuFile} --assume-role ${MuAcptRoleArn} env show ${AcptEnv} -f shell > mu-env.sh
                 - mv buildspec-test.yml buildspec.yml || echo "$DEFAULT_BUILDSPEC" > buildspec.yml
@@ -358,7 +365,7 @@ Resources:
                 - chmod +rx /usr/bin/mu
                 - mu -c ${MuFile} --assume-role ${MuProdRoleArn} --disable-iam env up ${ProdEnv} 
                 - mu -c ${MuFile} --assume-role ${MuProdRoleArn} --disable-iam db up ${ProdEnv} 
-                - mu -c ${MuFile} --assume-role ${MuProdRoleArn} --disable-iam svc deploy ${ProdEnv}
+                - mu -c ${MuFile} --assume-role ${MuProdRoleArn} --disable-iam ${ServiceOrBatch} deploy ${ProdEnv}
                 - mu -c ${MuFile} --assume-role ${MuProdRoleArn} env show ${ProdEnv} -f json > env.json
                 - mu -c ${MuFile} --assume-role ${MuProdRoleArn} env show ${ProdEnv} -f shell > mu-env.sh
                 - mv buildspec-prod.yml buildspec.yml || echo "$DEFAULT_BUILDSPEC" > buildspec.yml

@@ -15,6 +15,7 @@ type pipelineWorkflow struct {
 	repoName         string
 	codeDeployBucket string
 	notificationArn  string
+	serviceOrBatch   string
 }
 
 func colorizeActionStatus(actionStatus string) string {
@@ -39,13 +40,22 @@ func (workflow *pipelineWorkflow) serviceFinder(serviceName string, ctx *common.
 		// Repo Name
 		if serviceName != "" {
 			workflow.serviceName = serviceName
+		} else if ctx.Config.Batch.Name != "" {
+			workflow.serviceName = ctx.Config.Batch.Name
 		} else if ctx.Config.Service.Name == "" {
 			workflow.serviceName = ctx.Config.Repo.Name
 		} else {
 			workflow.serviceName = ctx.Config.Service.Name
 		}
 
-		workflow.pipelineConfig = &ctx.Config.Service.Pipeline
+		if ctx.Config.Batch.Pipeline.Source.Repo != "" {
+			workflow.pipelineConfig = &ctx.Config.Batch.Pipeline
+			workflow.serviceOrBatch = "svc"
+		} else {
+			workflow.pipelineConfig = &ctx.Config.Service.Pipeline
+			workflow.serviceOrBatch = "batch"
+		}
+
 		workflow.databaseName = ctx.Config.Service.Database.Name
 		workflow.codeRevision = ctx.Config.Repo.Revision
 		workflow.codeBranch = ctx.Config.Repo.Branch

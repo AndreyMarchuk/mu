@@ -71,6 +71,13 @@ func (rolesetMgr *iamRolesetManager) GetServiceRoleset(environmentName string, s
 	return roleset, nil
 }
 
+func (rolesetMgr *iamRolesetManager) GetBatchRoleset(environmentName string, serviceName string) (common.Roleset, error) {
+	roleset := rolesetMgr.getRolesetFromStack("batch", serviceName, environmentName)
+
+	overrideRole(roleset, "BatchJobRoleArn", rolesetMgr.context.Config.Batch.Roles.JobRoleArn)
+	return roleset, nil
+}
+
 func (rolesetMgr *iamRolesetManager) GetPipelineRoleset(serviceName string) (common.Roleset, error) {
 	roleset := rolesetMgr.getRolesetFromStack("pipeline", serviceName)
 
@@ -240,6 +247,49 @@ func (rolesetMgr *iamRolesetManager) UpsertServiceRoleset(environmentName string
 	return nil
 }
 
+func (rolesetMgr *iamRolesetManager) UpsertBatchRoleset(environmentName string, serviceName string) error {
+	if rolesetMgr.context.Config.DisableIAM {
+		log.Infof("Skipping upsert of batch IAM roles.")
+		return nil
+	}
+	stackName := common.CreateStackName(rolesetMgr.context.Config.Namespace, common.StackTypeIam, "batch", serviceName, environmentName)
+
+	stackTags := map[string]string{
+		"mu:type":        "iam",
+		"mu:environment": environmentName,
+		"mu:service":     serviceName,
+		"mu:revision":    rolesetMgr.context.Config.Repo.Revision,
+		"mu:repo":        rolesetMgr.context.Config.Repo.Name,
+	}
+
+	stackParams := map[string]string{
+		"Namespace":       rolesetMgr.context.Config.Namespace,
+		"EnvironmentName": environmentName,
+		"ServiceName":     serviceName,
+	}
+
+	policy, err := templates.GetAsset(common.TemplatePolicyDefault)
+	if err != nil {
+		return err
+	}
+
+	err = rolesetMgr.context.StackManager.UpsertStack(stackName, common.TemplateBatchIAM, rolesetMgr.context.Config.Batch, stackParams, stackTags, policy, "")
+	if err != nil {
+		return err
+	}
+
+	log.Debugf("Waiting for stack '%s' to complete", stackName)
+	stack := rolesetMgr.context.StackManager.AwaitFinalStatus(stackName)
+	if stack == nil {
+		return fmt.Errorf("Unable to create stack %s", stackName)
+	}
+	if strings.HasSuffix(stack.Status, "ROLLBACK_COMPLETE") || !strings.HasSuffix(stack.Status, "_COMPLETE") {
+		return fmt.Errorf("Ended in failed status %s %s", stack.Status, stack.StatusReason)
+	}
+
+	return nil
+}
+
 func (rolesetMgr *iamRolesetManager) UpsertPipelineRoleset(serviceName string, pipelineBucket string, codeDeployBucket string) error {
 	if rolesetMgr.context.Config.DisableIAM {
 		log.Infof("Skipping upsert of pipeline IAM roles.")
@@ -253,7 +303,12 @@ func (rolesetMgr *iamRolesetManager) UpsertPipelineRoleset(serviceName string, p
 		"mu:repo":     rolesetMgr.context.Config.Repo.Name,
 	}
 
-	pipelineConfig := rolesetMgr.context.Config.Service.Pipeline
+	var pipelineConfig *common.Pipeline
+	if rolesetMgr.context.Config.Batch.Pipeline.Source.Repo != "" {
+		pipelineConfig = &rolesetMgr.context.Config.Batch.Pipeline
+	} else {
+		pipelineConfig = &rolesetMgr.context.Config.Service.Pipeline
+	}
 
 	stackParams := map[string]string{
 		"Namespace":        rolesetMgr.context.Config.Namespace,
@@ -359,6 +414,25 @@ func (rolesetMgr *iamRolesetManager) DeleteServiceRoleset(environmentName string
 		return nil
 	}
 	stackName := common.CreateStackName(rolesetMgr.context.Config.Namespace, common.StackTypeIam, "service", serviceName, environmentName)
+	err := rolesetMgr.context.StackManager.DeleteStack(stackName)
+	if err != nil {
+		return err
+	}
+
+	log.Debugf("Waiting for stack '%s' to complete", stackName)
+	stack := rolesetMgr.context.StackManager.AwaitFinalStatus(stackName)
+	if stack != nil && !strings.HasSuffix(stack.Status, "_COMPLETE") {
+		return fmt.Errorf("Ended in failed status %s %s", stack.Status, stack.StatusReason)
+	}
+	return nil
+}
+
+func (rolesetMgr *iamRolesetManager) DeleteBatchRoleset(environmentName string, serviceName string) error {
+	if rolesetMgr.context.Config.DisableIAM {
+		log.Infof("Skipping delete of service IAM roles.")
+		return nil
+	}
+	stackName := common.CreateStackName(rolesetMgr.context.Config.Namespace, common.StackTypeIam, "batch", serviceName, environmentName)
 	err := rolesetMgr.context.StackManager.DeleteStack(stackName)
 	if err != nil {
 		return err

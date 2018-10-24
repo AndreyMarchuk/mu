@@ -98,6 +98,11 @@ const (
 	UndeployCmd                = "undeploy"
 	SvcUndeployCmdUsage        = "undeploy service from environment"
 	SvcUndeployArgsUsage       = "<environment> [<service>]"
+
+	BatchCmd                = "batch"
+	BatchUsage              = "options for managing batch jobs"
+	BatchDeployCmdUsage     = "register batch job definition"
+	BatchDeployTagFlagUsage = "flag usage"
 )
 
 // Constants to prevent multiple updates when making changes.

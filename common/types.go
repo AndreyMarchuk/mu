@@ -37,6 +37,7 @@ type Config struct {
 	Namespace    string        `yaml:"namespace,omitempty" validate:"validateAlphaNumericDash"`
 	Environments []Environment `yaml:"environments,omitempty"`
 	Service      Service       `yaml:"service,omitempty"`
+	Batch        Batch         `yaml:"batch,omitempty"`
 	Basedir      string        `yaml:"-"`
 	RelMuFile    string        `yaml:"-"`
 	Repo         struct {
@@ -168,6 +169,31 @@ type Service struct {
 		EcsService             string `yaml:"ecsService,omitempty" validate:"validateRoleARN"`
 		EcsTask                string `yaml:"ecsTask,omitempty" validate:"validateRoleARN"`
 		ApplicationAutoScaling string `yaml:"applicationAutoScaling,omitempty" validate:"validateRoleARN"`
+	} `yaml:"roles,omitempty"`
+}
+
+// Batch defines the structure of the yml file for a batch job
+type Batch struct {
+	Name            string                 `yaml:"name,omitempty" validate:"validateLeadingAlphaNumericDash"`
+	DesiredCount    int                    `yaml:"desiredCount,omitempty"`
+	MinSize         int                    `yaml:"minSize,omitempty"`
+	MaxSize         int                    `yaml:"maxSize,omitempty"`
+	Dockerfile      string                 `yaml:"dockerfile,omitempty"`
+	ImageRepository string                 `yaml:"imageRepository,omitempty"`
+	ContainerImage  string                 `yaml:"containerImage,omitempty"`
+	VCPU            int                    `yaml:"vcpu,omitempty"`
+	Memory          int                    `yaml:"memory,omitempty"`
+	Attempts        int                    `yaml:"attempts,omitempty"`
+	Links           []string               `yaml:"links,omitempty"`
+	Environment     map[string]interface{} `yaml:"environment,omitempty"`
+	Pipeline        Pipeline               `yaml:"pipeline,omitempty"`
+	Roles           struct {
+		JobRoleArn string `yaml:"jobRole,omitempty" validate:"validateRoleARN"`
+		//Ec2Instance            string `yaml:"ec2Instance,omitempty" validate:"validateRoleARN"`
+		//CodeDeploy string `yaml:"codeDeploy,omitempty" validate:"validateRoleARN"`
+		//EcsEvents              string `yaml:"ecsEvents,omitempty" validate:"validateRoleARN"`
+		//EcsService             string `yaml:"ecsService,omitempty" validate:"validateRoleARN"`
+		//ApplicationAutoScaling string `yaml:"applicationAutoScaling,omitempty" validate:"validateRoleARN"`
 	} `yaml:"roles,omitempty"`
 }
 
@@ -358,6 +384,7 @@ const (
 	StackTypeDatabase               = "database"
 	StackTypeSchedule               = "schedule"
 	StackTypeBucket                 = "bucket"
+	StackTypeBatch                  = "batch"
 )
 
 // List of valid template files
@@ -388,6 +415,8 @@ const (
 	TemplateK8sDeployment          = "kubernetes/deployment.yml"
 	TemplateK8sDatabase            = "kubernetes/database.yml"
 	TemplateK8sIngress             = "kubernetes/ingress.yml"
+	TemplateBatchJob               = "cloudformation/batch-job.yml"
+	TemplateBatchIAM               = "cloudformation/batch-iam.yml"
 )
 
 // DeploymentStrategy describes supported deployment strategies

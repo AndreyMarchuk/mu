@@ -8,6 +8,7 @@ type RolesetUpserter interface {
 	UpsertCommonRoleset() error
 	UpsertEnvironmentRoleset(environmentName string) error
 	UpsertServiceRoleset(environmentName string, serviceName string, codeDeployBucket string, databaseName string) error
+	UpsertBatchRoleset(environmentName string, serviceName string) error
 	UpsertPipelineRoleset(serviceName string, pipelineBucket string, codeDeployBucket string) error
 }
 
@@ -16,6 +17,7 @@ type RolesetGetter interface {
 	GetCommonRoleset() (Roleset, error)
 	GetEnvironmentRoleset(environmentName string) (Roleset, error)
 	GetServiceRoleset(environmentName string, serviceName string) (Roleset, error)
+	GetBatchRoleset(environmentName string, serviceName string) (Roleset, error)
 	GetPipelineRoleset(serviceName string) (Roleset, error)
 }
 
@@ -24,6 +26,7 @@ type RolesetDeleter interface {
 	DeleteCommonRoleset() error
 	DeleteEnvironmentRoleset(environmentName string) error
 	DeleteServiceRoleset(environmentName string, serviceName string) error
+	DeleteBatchRoleset(environmentName string, serviceName string) error
 	DeletePipelineRoleset(serviceName string) error
 }
 

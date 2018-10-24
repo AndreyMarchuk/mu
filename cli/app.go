@@ -28,6 +28,7 @@ func NewApp() *cli.App {
 		*newDatabasesCommand(context),
 		*newValidateCommand(context),
 		*newPurgeCommand(context),
+		*newBatchCommand(context),
 	}
 
 	app.Before = func(c *cli.Context) error {

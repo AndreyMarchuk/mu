@@ -384,6 +384,16 @@ Resources:
               StringLike:
                 iam:AWSServiceName: rds.amazonaws.com
             Effect: Allow
+      - PolicyName: aws-batch-jobs
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action:
+            - batch:RegisterJobDefinition
+            - batch:DeregisterJobDefinition
+            - batch:DescribeJobDefinitions
+            Resource: '*'
+            Effect: Allow
 Outputs:
   CloudFormationRoleArn:
     Description: Role assummed by CloudFormation

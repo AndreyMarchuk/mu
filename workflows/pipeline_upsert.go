@@ -17,10 +17,18 @@ func NewPipelineUpserter(ctx *common.Context, tokenProvider func(bool) string) E
 	workflow.codeRevision = ctx.Config.Repo.Revision
 	workflow.repoName = ctx.Config.Repo.Slug
 
+	// pipeline for Batch or Service
+	var pipeline *common.Pipeline
+	if ctx.Config.Batch.Pipeline.Source.Repo != "" {
+		pipeline = &ctx.Config.Batch.Pipeline
+	} else {
+		pipeline = &ctx.Config.Service.Pipeline
+	}
+
 	if ctx.Config.Repo.Branch != "" {
 		workflow.codeBranch = ctx.Config.Repo.Branch
 	} else {
-		workflow.codeBranch = ctx.Config.Service.Pipeline.Source.Branch
+		workflow.codeBranch = pipeline.Source.Branch
 	}
 
 	stackParams := make(map[string]string)
@@ -30,19 +38,19 @@ func NewPipelineUpserter(ctx *common.Context, tokenProvider func(bool) string) E
 		workflow.pipelineToken(ctx.Config.Namespace, tokenProvider, ctx.StackManager, stackParams),
 		newParallelExecutor(
 			workflow.pipelineBucket(ctx.Config.Namespace, stackParams, ctx.StackManager, ctx.StackManager),
-			workflow.codedeployBucket(ctx.Config.Namespace, &ctx.Config.Service, ctx.StackManager, ctx.StackManager),
+			workflow.codedeployBucket(ctx.Config.Namespace, pipeline, ctx.StackManager, ctx.StackManager),
 		),
 		workflow.pipelineRolesetUpserter(ctx.RolesetManager, ctx.RolesetManager, stackParams),
 		workflow.pipelineUpserter(ctx.Config.Namespace, ctx.StackManager, ctx.StackManager, stackParams),
-		workflow.pipelineNotifyUpserter(ctx.Config.Namespace, &ctx.Config.Service.Pipeline, ctx.SubscriptionManager))
+		workflow.pipelineNotifyUpserter(ctx.Config.Namespace, pipeline, ctx.SubscriptionManager))
 
 }
 
-func (workflow *pipelineWorkflow) codedeployBucket(namespace string, service *common.Service, stackUpserter common.StackUpserter, stackWaiter common.StackWaiter) Executor {
+func (workflow *pipelineWorkflow) codedeployBucket(namespace string, pipeline *common.Pipeline, stackUpserter common.StackUpserter, stackWaiter common.StackWaiter) Executor {
 	return func() error {
 
-		if service.Pipeline.Build.Bucket != "" {
-			workflow.codeDeployBucket = service.Pipeline.Build.Bucket
+		if workflow.pipelineConfig.Build.Bucket != "" {
+			workflow.codeDeployBucket = workflow.pipelineConfig.Build.Bucket
 		} else {
 			bucketStackName := common.CreateStackName(namespace, common.StackTypeBucket, "codedeploy")
 			log.Noticef("Upserting Bucket for CodeDeploy")
@@ -241,6 +249,9 @@ func PipelineParams(workflow *pipelineWorkflow, namespace string, params map[str
 	pipelineParams["MuFile"] = workflow.muFile
 	pipelineParams["SourceProvider"] = workflow.pipelineConfig.Source.Provider
 	pipelineParams["SourceRepo"] = workflow.pipelineConfig.Source.Repo
+
+	// use svc or batch for deploy
+	pipelineParams["ServiceOrBatch"] = workflow.serviceOrBatch
 
 	common.NewMapElementIfNotEmpty(pipelineParams, "SourceBranch", workflow.codeBranch)
 
