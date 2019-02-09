@@ -117,6 +117,11 @@ func (workflow *serviceWorkflow) serviceApplyEcsParams(service *common.Service, 
 		params["ServiceSubnetIds"] = fmt.Sprintf("%s-InstanceSubnetIds", workflow.envStack.Name)
 		params["ServiceSecurityGroup"] = fmt.Sprintf("%s-InstanceSecurityGroup", workflow.envStack.Name)
 		params["ElbSecurityGroup"] = fmt.Sprintf("%s-InstanceSecurityGroup", workflow.lbStack.Name)
+		params["ServiceDiscoveryId"] = fmt.Sprintf("%s-ServiceDiscoveryId", workflow.lbStack.Name)
+		params["ServiceDiscoveryName"] = fmt.Sprintf("%s-ServiceDiscoveryName", workflow.lbStack.Name)
+		if service.DiscoveryTTL != "" {
+			params["ServiceDiscoveryTTL"] = service.DiscoveryTTL
+		}
 		params["ImageUrl"] = workflow.serviceImage
 
 		cpu := common.CPUMemorySupport[0]
@@ -150,10 +155,11 @@ func (workflow *serviceWorkflow) serviceApplyEcsParams(service *common.Service, 
 
 		// force 'awsvpc' network mode for ecs-fargate
 		if strings.EqualFold(string(workflow.envStack.Tags["provider"]), string(common.EnvProviderEcsFargate)) {
-			params["TaskNetworkMode"] = "awsvpc"
+			params["TaskNetworkMode"] = common.NetworkModeAwsVpc
 		} else if service.NetworkMode != "" {
-			params["TaskNetworkMode"] = service.NetworkMode
+			params["TaskNetworkMode"] = string(service.NetworkMode)
 		}
+
 		serviceRoleset, err := rolesetGetter.GetServiceRoleset(workflow.envStack.Tags["environment"], workflow.serviceName)
 		if err != nil {
 			return err
@@ -163,6 +169,21 @@ func (workflow *serviceWorkflow) serviceApplyEcsParams(service *common.Service, 
 		params["EcsTaskRoleArn"] = serviceRoleset["EcsTaskRoleArn"]
 		params["ApplicationAutoScalingRoleArn"] = serviceRoleset["ApplicationAutoScalingRoleArn"]
 		params["ServiceName"] = workflow.serviceName
+
+		switch service.DeploymentStrategy {
+		case common.BlueGreenDeploymentStrategy:
+			params["MinimumHealthyPercent"] = "100"
+			params["MaximumPercent"] = "200"
+		case common.ReplaceDeploymentStrategy:
+			params["MinimumHealthyPercent"] = "0"
+			params["MaximumPercent"] = "100"
+		case common.RollingDeploymentStrategy:
+			params["MinimumHealthyPercent"] = "50"
+			params["MaximumPercent"] = "100"
+		default:
+			params["MinimumHealthyPercent"] = "100"
+			params["MaximumPercent"] = "200"
+		}
 
 		return nil
 	}
@@ -183,9 +204,7 @@ func (workflow *serviceWorkflow) serviceApplyEc2Params(params map[string]string,
 			"ImageOsType",
 			"KeyName",
 			"HttpProxy",
-			"ConsulServerAutoScalingGroup",
 			"ElbSecurityGroup",
-			"ConsulRpcClientSecurityGroup",
 			"InstanceSecurityGroup",
 		} {
 			params[key] = workflow.envStack.Outputs[key]
@@ -266,7 +285,7 @@ func (workflow *serviceWorkflow) serviceApplyCommonParams(namespace string, serv
 			params["ServicePort"] = strconv.Itoa(service.Port)
 		}
 		if service.Protocol != "" {
-			params["ServiceProtocol"] = strings.ToUpper(service.Protocol)
+			params["ServiceProtocol"] = string(service.Protocol)
 		}
 		if service.HealthEndpoint != "" {
 			params["ServiceHealthEndpoint"] = service.HealthEndpoint
@@ -286,7 +305,6 @@ func (workflow *serviceWorkflow) serviceApplyCommonParams(namespace string, serv
 		if len(service.HostPatterns) > 0 {
 			params["HostPattern"] = strings.Join(service.HostPatterns, ",")
 		}
-
 		return nil
 	}
 }

@@ -1,11 +1,12 @@
 package common
 
 import (
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewContext(t *testing.T) {
@@ -63,6 +64,29 @@ func TestLoadBadYamlConfig(t *testing.T) {
 	assert := assert.New(t)
 
 	yamlConfig := `   blah blah blah   `
+
+	context := NewContext()
+	config := &context.Config
+	err := loadYamlConfig(config, strings.NewReader(yamlConfig))
+	assert.NotNil(err)
+}
+
+func TestLoadInvalidParam(t *testing.T) {
+	assert := assert.New(t)
+
+	yamlConfig :=
+		`
+---
+environments:
+  - name: dev
+    loadbalancer:
+      hostedzone: api-dev.example.com
+    cluster:
+      desiredCapacity: 1
+      maxSize: 1
+service:
+  invalidParam: 2
+`
 
 	context := NewContext()
 	config := &context.Config

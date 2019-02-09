@@ -2,8 +2,9 @@ package workflows
 
 import (
 	"fmt"
-	"github.com/stelligent/mu/common"
 	"strings"
+
+	"github.com/stelligent/mu/common"
 )
 
 // NewEnvironmentTerminator create a new workflow for terminating an environment
@@ -12,20 +13,19 @@ func NewEnvironmentTerminator(ctx *common.Context, environmentName string) Execu
 	workflow := new(environmentWorkflow)
 
 	return newPipelineExecutor(
-		workflow.environmentServiceTerminator(environmentName, ctx.StackManager, ctx.StackManager, ctx.StackManager, ctx.RolesetManager),
-		workflow.environmentDbTerminator(environmentName, ctx.StackManager, ctx.StackManager, ctx.StackManager),
+		workflow.environmentServiceTerminator(ctx.Config.Namespace, environmentName, ctx.StackManager, ctx.StackManager, ctx.StackManager, ctx.RolesetManager),
+		workflow.environmentDbTerminator(ctx.Config.Namespace, environmentName, ctx.StackManager, ctx.StackManager, ctx.StackManager),
 		workflow.environmentEcsTerminator(ctx.Config.Namespace, environmentName, ctx.StackManager, ctx.StackManager),
-		workflow.environmentConsulTerminator(ctx.Config.Namespace, environmentName, ctx.StackManager, ctx.StackManager),
 		workflow.environmentRolesetTerminator(ctx.RolesetManager, environmentName),
 		workflow.environmentElbTerminator(ctx.Config.Namespace, environmentName, ctx.StackManager, ctx.StackManager),
 		workflow.environmentVpcTerminator(ctx.Config.Namespace, environmentName, ctx.StackManager, ctx.StackManager),
 	)
 }
 
-func (workflow *environmentWorkflow) environmentServiceTerminator(environmentName string, stackLister common.StackLister, stackDeleter common.StackDeleter, stackWaiter common.StackWaiter, rolesetDeleter common.RolesetDeleter) Executor {
+func (workflow *environmentWorkflow) environmentServiceTerminator(namespace string, environmentName string, stackLister common.StackLister, stackDeleter common.StackDeleter, stackWaiter common.StackWaiter, rolesetDeleter common.RolesetDeleter) Executor {
 	return func() error {
 		log.Noticef("Terminating Services for environment '%s' ...", environmentName)
-		stacks, err := stackLister.ListStacks(common.StackTypeService)
+		stacks, err := stackLister.ListStacks(common.StackTypeService, namespace)
 		if err != nil {
 			return err
 		}
@@ -51,10 +51,10 @@ func (workflow *environmentWorkflow) environmentServiceTerminator(environmentNam
 		return nil
 	}
 }
-func (workflow *environmentWorkflow) environmentDbTerminator(environmentName string, stackLister common.StackLister, stackDeleter common.StackDeleter, stackWaiter common.StackWaiter) Executor {
+func (workflow *environmentWorkflow) environmentDbTerminator(namespace string, environmentName string, stackLister common.StackLister, stackDeleter common.StackDeleter, stackWaiter common.StackWaiter) Executor {
 	return func() error {
 		log.Noticef("Terminating Databases for environment '%s' ...", environmentName)
-		stacks, err := stackLister.ListStacks(common.StackTypeDatabase)
+		stacks, err := stackLister.ListStacks(common.StackTypeDatabase, namespace)
 		if err != nil {
 			return err
 		}
@@ -73,23 +73,6 @@ func (workflow *environmentWorkflow) environmentDbTerminator(environmentName str
 			}
 			log.Infof("   Terminating database for service '%s' from environment '%s'", stack.Tags["service"], environmentName)
 			stackWaiter.AwaitFinalStatus(stack.Name)
-		}
-
-		return nil
-	}
-}
-func (workflow *environmentWorkflow) environmentConsulTerminator(namespace string, environmentName string, stackDeleter common.StackDeleter, stackWaiter common.StackWaiter) Executor {
-	return func() error {
-		log.Noticef("Terminating Consul environment '%s' ...", environmentName)
-		envStackName := common.CreateStackName(namespace, common.StackTypeConsul, environmentName)
-		err := stackDeleter.DeleteStack(envStackName)
-		if err != nil {
-			return err
-		}
-
-		stack := stackWaiter.AwaitFinalStatus(envStackName)
-		if stack != nil && !strings.HasSuffix(stack.Status, "_COMPLETE") {
-			return fmt.Errorf("Ended in failed status %s %s", stack.Status, stack.StatusReason)
 		}
 
 		return nil

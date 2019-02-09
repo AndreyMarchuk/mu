@@ -167,10 +167,11 @@ func (cfnMgr *cloudformationStackManager) UpsertStack(stackName string, template
 		log.Debugf("  Assume role:\n\t%s", roleArn)
 		log.Debugf("  Stack tags:\n\t%s", stackTags)
 		params := &cloudformation.CreateStackInput{
-			StackName:    aws.String(stackName),
-			Parameters:   stackParameters,
-			TemplateBody: templateBody,
-			Tags:         stackTags,
+			StackName:        aws.String(stackName),
+			Parameters:       stackParameters,
+			TemplateBody:     templateBody,
+			Tags:             stackTags,
+			TimeoutInMinutes: aws.Int64(60),
 		}
 
 		if roleArn != "" {
@@ -397,7 +398,7 @@ func buildStack(stackDetails *cloudformation.Stack) *common.Stack {
 }
 
 // ListStacks will find mu stacks
-func (cfnMgr *cloudformationStackManager) ListStacks(stackType common.StackType) ([]*common.Stack, error) {
+func (cfnMgr *cloudformationStackManager) ListStacks(stackType common.StackType, namespace string) ([]*common.Stack, error) {
 	cfnAPI := cfnMgr.cfnAPI
 
 	params := &cloudformation.DescribeStacksInput{}
@@ -414,8 +415,9 @@ func (cfnMgr *cloudformationStackManager) ListStacks(stackType common.StackType)
 				}
 
 				stack := buildStack(stackDetails)
+				expectedStackPrefix := fmt.Sprintf("%s-%s", namespace, stackType)
 
-				if stack.Tags["type"] == string(stackType) {
+				if stack.Tags["type"] == string(stackType) && strings.HasPrefix(stack.Name, expectedStackPrefix) {
 					stacks = append(stacks, stack)
 				}
 			}
@@ -444,6 +446,25 @@ func (cfnMgr *cloudformationStackManager) GetStack(stackName string) (*common.St
 	stack := buildStack(resp.Stacks[0])
 
 	return stack, nil
+}
+
+// CountAZs for current region
+func (cfnMgr *cloudformationStackManager) CountAZs() (int, error) {
+	ec2Api := cfnMgr.ec2API
+	resp, err := ec2Api.DescribeAvailabilityZones(&ec2.DescribeAvailabilityZonesInput{
+		Filters: []*ec2.Filter{
+			{
+				Name: aws.String("state"),
+				Values: []*string{
+					aws.String("available"),
+				},
+			},
+		},
+	})
+	if err != nil {
+		return 0, err
+	}
+	return len(resp.AvailabilityZones), nil
 }
 
 // FindLatestImageID for a given

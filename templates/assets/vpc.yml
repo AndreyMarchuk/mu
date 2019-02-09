@@ -99,6 +99,10 @@ Parameters:
     Description: SSH Key to add to bastion
     Type: String
     Default: ''
+  AZCount:
+    Description: Number of availability zones to use
+    Type: String
+    Default: '3'
 Conditions:
   HasElbSubnetAZ1:
     "Fn::Not":
@@ -111,10 +115,15 @@ Conditions:
         - !Ref ElbSubnetAZ2CidrBlock
         - ''
   HasElbSubnetAZ3:
-    "Fn::Not":
-      - "Fn::Equals":
-        - !Ref ElbSubnetAZ3CidrBlock
-        - ''
+    "Fn::And":
+      - "Fn::Not":
+        - "Fn::Equals":
+          - !Ref AZCount
+          - '2'
+      - "Fn::Not":
+        - "Fn::Equals":
+          - !Ref ElbSubnetAZ3CidrBlock
+          - ''
   HasInstanceSubnetAZ1:
     "Fn::Not":
       - "Fn::Equals":
@@ -126,10 +135,15 @@ Conditions:
         - !Ref InstanceSubnetAZ2CidrBlock
         - ''
   HasInstanceSubnetAZ3:
-    "Fn::Not":
-      - "Fn::Equals":
-        - !Ref InstanceSubnetAZ3CidrBlock
-        - ''
+    "Fn::And":
+      - "Fn::Not":
+        - "Fn::Equals":
+          - !Ref AZCount
+          - '2'
+      - "Fn::Not":
+        - "Fn::Equals":
+          - !Ref InstanceSubnetAZ3CidrBlock
+          - ''
   IsPublicElb:
     "Fn::Not":
       - "Fn::Equals":

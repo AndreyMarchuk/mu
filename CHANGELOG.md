@@ -1,5 +1,80 @@
 # Change Log
 
+## [v1.5.3](https://github.com/stelligent/mu/tree/v1.5.3) (2018-09-12)
+[Full Changelog](https://github.com/stelligent/mu/compare/v1.5.2...v1.5.3)
+
+**Fixed bugs:**
+
+- Namespace with hyphen [\#327](https://github.com/stelligent/mu/issues/327)
+
+**Closed issues:**
+
+- Validate config file [\#258](https://github.com/stelligent/mu/issues/258)
+
+**Merged pull requests:**
+
+- Issue 258 - Validation [\#325](https://github.com/stelligent/mu/pull/325) ([mneil](https://github.com/mneil))
+
+## [v1.5.2](https://github.com/stelligent/mu/tree/v1.5.2) (2018-08-30)
+[Full Changelog](https://github.com/stelligent/mu/compare/v1.5.1...v1.5.2)
+
+**Fixed bugs:**
+
+- Unable to provision schedule tasks [\#322](https://github.com/stelligent/mu/issues/322)
+- Namespace not honored when terminating environments [\#316](https://github.com/stelligent/mu/issues/316)
+- AccessDenied when directory's name different from repo's name [\#300](https://github.com/stelligent/mu/issues/300)
+
+**Closed issues:**
+
+- Quickstart Basic Guide Fails on mu pipeline up [\#318](https://github.com/stelligent/mu/issues/318)
+- Code pipeline error [\#312](https://github.com/stelligent/mu/issues/312)
+- Parameterised timeouts for pipeline steps [\#214](https://github.com/stelligent/mu/issues/214)
+
+**Merged pull requests:**
+
+- Issue \#214 - Added DeployTimeout to allow pipline timeout override [\#321](https://github.com/stelligent/mu/pull/321) ([mneil](https://github.com/mneil))
+- fix \#316 - Namespace not honored when terminating environments [\#317](https://github.com/stelligent/mu/pull/317) ([cplee](https://github.com/cplee))
+
+## [v1.5.1](https://github.com/stelligent/mu/tree/v1.5.1) (2018-08-14)
+[Full Changelog](https://github.com/stelligent/mu/compare/v1.4.6...v1.5.1)
+
+**Fixed bugs:**
+
+- mu svc restart appears to restart all services, rather than the specified service [\#279](https://github.com/stelligent/mu/issues/279)
+- Problems converging a base environment in us-west-1 [\#195](https://github.com/stelligent/mu/issues/195)
+
+**Closed issues:**
+
+- Use existing ECS Cluster [\#301](https://github.com/stelligent/mu/issues/301)
+- Integrate with new native ECS service discovery [\#299](https://github.com/stelligent/mu/issues/299)
+- mu pipeline term not removing the pipeline? [\#288](https://github.com/stelligent/mu/issues/288)
+- codepipeline may be making unauthenticated calls to github [\#287](https://github.com/stelligent/mu/issues/287)
+- mu-env.sh has a weird string included in 1.4.3 [\#286](https://github.com/stelligent/mu/issues/286)
+- Support adding a hosted internal route53 zone [\#252](https://github.com/stelligent/mu/issues/252)
+- Support choosing deployment strategy [\#251](https://github.com/stelligent/mu/issues/251)
+
+**Merged pull requests:**
+
+- Remove consul [\#314](https://github.com/stelligent/mu/pull/314) ([cplee](https://github.com/cplee))
+- 1.5.1 development [\#313](https://github.com/stelligent/mu/pull/313) ([cplee](https://github.com/cplee))
+
+## [v1.4.6](https://github.com/stelligent/mu/tree/v1.4.6) (2018-07-30)
+[Full Changelog](https://github.com/stelligent/mu/compare/v1.4.5...v1.4.6)
+
+**Closed issues:**
+
+- can i change the pipeline name [\#311](https://github.com/stelligent/mu/issues/311)
+- Can I use mu to initiate a rollback?  [\#310](https://github.com/stelligent/mu/issues/310)
+- period\(.\) in image tag in mu version 1.4.5 [\#308](https://github.com/stelligent/mu/issues/308)
+- Update DB Username field in CFN for cfn\_nag F24 [\#306](https://github.com/stelligent/mu/issues/306)
+- Logging provider assumptions during push [\#304](https://github.com/stelligent/mu/issues/304)
+- Support for Gitlab as pipeline source provider [\#302](https://github.com/stelligent/mu/issues/302)
+- Invalid image tag [\#295](https://github.com/stelligent/mu/issues/295)
+
+**Merged pull requests:**
+
+- Log provider assumptions [\#305](https://github.com/stelligent/mu/pull/305) ([rmc3](https://github.com/rmc3))
+
 ## [v1.4.5](https://github.com/stelligent/mu/tree/v1.4.5) (2018-03-15)
 [Full Changelog](https://github.com/stelligent/mu/compare/v1.4.4...v1.4.5)
 

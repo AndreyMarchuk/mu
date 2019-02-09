@@ -1,6 +1,7 @@
 import os
 import requests
 import pymysql.cursors 
+import socket
 from flask import Flask
 app = Flask(__name__)
 
@@ -19,5 +20,8 @@ def hello():
           assert cursor.rowcount > 0
   finally:
       connection.close()
+
+  res = socket.gethostbyname_ex("e2e-fargate.%s" % os.environ['_SERVICE_DISCOVERY_NAME'])[2]
+  assert len(res) > 0
 
   return "ok"

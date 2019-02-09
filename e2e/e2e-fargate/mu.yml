@@ -1,10 +1,8 @@
 ---
 
 environments:
-  - name: e2e-basic-dev
-    cluster:
-      keyName: mu-e2e
-      maxSize: 2
+  - name: e2e-fargate-dev
+    provider: ecs-fargate
 
 service:
   healthEndpoint: /
@@ -12,7 +10,7 @@ service:
   pathPatterns:
     - /*
   database:
-    name: e2ebasic
+    name: e2efgate
     engine: mysql
   environment:
     DB_HOST: ${DatabaseEndpointAddress}
@@ -22,6 +20,6 @@ service:
     DB_NAME: mysql
   pipeline:
     acceptance:
-      environment: e2e-basic-dev
+      environment: e2e-fargate-dev
     production:
       disabled: true

@@ -22,7 +22,7 @@ type StackUpserter interface {
 
 // StackLister for listing stacks
 type StackLister interface {
-	ListStacks(stackType StackType) ([]*Stack, error)
+	ListStacks(stackType StackType, namespace string) ([]*Stack, error)
 }
 
 // StackGetter for getting stacks
@@ -40,6 +40,11 @@ type ImageFinder interface {
 	FindLatestImageID(namePattern string) (string, error)
 }
 
+// AZCounter for counting availability zones in a region
+type AZCounter interface {
+	CountAZs() (int, error)
+}
+
 // StackManager composite of all stack capabilities
 type StackManager interface {
 	StackUpserter
@@ -48,4 +53,5 @@ type StackManager interface {
 	StackGetter
 	StackDeleter
 	ImageFinder
+	AZCounter
 }
