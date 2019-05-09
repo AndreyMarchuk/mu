@@ -112,7 +112,11 @@ func (ctx *Context) InitializeConfigFromFile(muFile string) error {
 						log.Infof("Could not read hash file: %s", err)
 					}
 
-					ctx.Config.Repo.Revision = string(content)
+					imageTag := strings.TrimSpace(string(content))
+
+					log.Infof("Image tag: %s", imageTag)
+
+					ctx.Config.Repo.Revision = imageTag
 				} else {
 					sourceVersion := os.Getenv("CODEBUILD_RESOLVED_SOURCE_VERSION")
 
