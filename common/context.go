@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/url"
 	"os"
 	"path"
@@ -35,6 +36,16 @@ func SetVersion(v string) {
 func NewContext() *Context {
 	ctx := new(Context)
 	return ctx
+}
+
+func fileExists(fileName string) bool {
+	fileInfo, err := os.Stat(fileName)
+
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	return !fileInfo.IsDir()
 }
 
 // InitializeConfigFromFile loads config from file
@@ -92,17 +103,29 @@ func (ctx *Context) InitializeConfigFromFile(muFile string) error {
 					log.Warningf("Unable to determine git information from CodeBuild initiator '%s': %s", initiator, err)
 				}
 
-				sourceVersion := os.Getenv("CODEBUILD_RESOLVED_SOURCE_VERSION")
+				if fileExists("./code_hash.txt") {
+					log.Info("code_hash file found")
 
-				// Remove invalid characters from sourceVersion
-				replacer := strings.NewReplacer(".", "", "_", "", "-", "")
-				sourceVersion = replacer.Replace(sourceVersion)
+					content, err := ioutil.ReadFile("./code_hash.txt")
 
-				if sourceVersion == "" {
-					sourceVersion = gitInfo.Revision
-				}
-				if len(sourceVersion) > 7 {
-					ctx.Config.Repo.Revision = string(sourceVersion[:7])
+					if err != nil {
+						log.Infof("Could not read hash file: %s", err)
+					}
+
+					ctx.Config.Repo.Revision = string(content)
+				} else {
+					sourceVersion := os.Getenv("CODEBUILD_RESOLVED_SOURCE_VERSION")
+
+					// Remove invalid characters from sourceVersion
+					replacer := strings.NewReplacer(".", "", "_", "", "-", "")
+					sourceVersion = replacer.Replace(sourceVersion)
+
+					if sourceVersion == "" {
+						sourceVersion = gitInfo.Revision
+					}
+					if len(sourceVersion) > 7 {
+						ctx.Config.Repo.Revision = string(sourceVersion[:7])
+					}
 				}
 
 				ctx.Config.Repo.Name = gitInfo.RepoName
