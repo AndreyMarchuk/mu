@@ -374,6 +374,13 @@ Resources:
       SecurityGroups:
       - !Ref InstanceSecurityGroup
       - !Ref ElbSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: "/dev/xvdcz"
+          Ebs:
+            VolumeType: "gp2"
+            Iops: "225"
+            DeleteOnTermination: "true"
+            VolumeSize: "75"
       InstanceType: !Ref InstanceType
       IamInstanceProfile: !Ref EC2InstanceProfileArn
       KeyName:
