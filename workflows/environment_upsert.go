@@ -363,6 +363,7 @@ func (workflow *environmentWorkflow) environmentUpserter(namespace string, envSt
 		stackParams["SshAllow"] = "0.0.0.0/0"
 		common.NewMapElementIfNotEmpty(stackParams, "SshAllow", environment.Cluster.SSHAllow)
 		common.NewMapElementIfNotEmpty(stackParams, "InstanceType", environment.Cluster.InstanceType)
+		common.NewMapElementIfNotZero(stackParams, "EbsVolumeSize", environment.Cluster.EbsVolumeSize)
 		common.NewMapElementIfNotEmpty(stackParams, "ExtraUserData", environment.Cluster.ExtraUserData)
 		common.NewMapElementIfNotEmpty(stackParams, "ImageId", environment.Cluster.ImageID)
 

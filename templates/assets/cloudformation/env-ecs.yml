@@ -58,6 +58,10 @@ Parameters:
     - 'amazon'
     - 'centos7'
     - 'windows'
+  EbsVolumeSize:
+    Description: EBS Volume size in GB
+    Type: Number
+    Default: '22'
   InstanceSubnetIds:
     Type: String
     Description: Name of the value to import for the ecs subnet ids
@@ -378,9 +382,8 @@ Resources:
         - DeviceName: "/dev/xvdcz"
           Ebs:
             VolumeType: "gp2"
-            Iops: "225"
             DeleteOnTermination: "true"
-            VolumeSize: "75"
+            VolumeSize: !Ref EbsVolumeSize
       InstanceType: !Ref InstanceType
       IamInstanceProfile: !Ref EC2InstanceProfileArn
       KeyName:

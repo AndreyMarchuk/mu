@@ -122,6 +122,7 @@ type Loadbalancer struct {
 // Cluster defines the scructure of the yml file for a cluster of EC2 instance AWS::AutoScaling::LaunchConfiguration
 type Cluster struct {
 	InstanceType            string          `yaml:"instanceType,omitempty" validate:"validateInstanceType"`
+	EbsVolumeSize           int             `yaml:"ebsVolumeSize,omitempty"`
 	ImageID                 string          `yaml:"imageId,omitempty" validate:"validateResourceID=ami"`
 	ImageOsType             string          `yaml:"osType,omitempty"`
 	InstanceTenancy         InstanceTenancy `yaml:"instanceTenancy,omitempty"`
