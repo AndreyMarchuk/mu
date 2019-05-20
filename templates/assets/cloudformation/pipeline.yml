@@ -303,7 +303,7 @@ Resources:
           artifacts:
             files:
               - '**/*'
-      TimeoutInMinutes: 10
+      TimeoutInMinutes: 20
   TestAcceptance:
     Type: AWS::CodeBuild::Project
     Condition: IsAcptEnabled
