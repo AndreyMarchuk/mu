@@ -373,6 +373,7 @@ Resources:
               command: !Sub |
                 #!/bin/bash
                 echo ECS_CLUSTER=${EcsCluster}  >> /etc/ecs/ecs.config
+                echo 'ECS_AVAILABLE_LOGGING_DRIVERS=["json-file","syslog","awslogs","splunk","none"]' >> /etc/ecs/ecs.config
     Properties:
       ImageId: !Ref ImageId
       SecurityGroups:
