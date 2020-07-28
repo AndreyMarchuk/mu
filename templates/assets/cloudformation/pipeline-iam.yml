@@ -384,6 +384,7 @@ Resources:
             - ecr:PutImage
             - ecr:DeleteLifecyclePolicy
             - ecr:ListTagsForResource
+            - ecr:TagResource
             Effect: Allow
             Resource: !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${Namespace}-${ServiceName}
           - Action:
