@@ -383,6 +383,7 @@ Resources:
             - ecr:CompleteLayerUpload
             - ecr:PutImage
             - ecr:DeleteLifecyclePolicy
+            - ecr:ListTagsForResource
             Effect: Allow
             Resource: !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${Namespace}-${ServiceName}
           - Action:
