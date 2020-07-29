@@ -385,6 +385,7 @@ Resources:
             - ecr:DeleteLifecyclePolicy
             - ecr:ListTagsForResource
             - ecr:TagResource
+            - ecr:UntagResource
             Effect: Allow
             Resource: !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${Namespace}-${ServiceName}
           - Action:
