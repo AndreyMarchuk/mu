@@ -396,6 +396,7 @@ Resources:
             - batch:RegisterJobDefinition
             - batch:DeregisterJobDefinition
             - batch:DescribeJobDefinitions
+            - batch:TagResource
             Resource: '*'
             Effect: Allow
           - Action:
