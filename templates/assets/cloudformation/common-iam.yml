@@ -91,33 +91,7 @@ Resources:
           Version: '2012-10-17'
           Statement:
           - Action:
-            - elasticloadbalancing:CreateLoadBalancer
-            - elasticloadbalancing:DescribeLoadBalancers
-            - elasticloadbalancing:DescribeLoadBalancerAttributes
-            - elasticloadbalancing:ModifyLoadBalancerAttributes
-            - elasticloadbalancing:DeleteLoadBalancer
-            - elasticloadbalancing:CreateListener
-            - elasticloadbalancing:ModifyListener
-            - elasticloadbalancing:DescribeListeners
-            - elasticloadbalancing:DeleteListener
-            - elasticloadbalancing:CreateRule
-            - elasticloadbalancing:DescribeRules
-            - elasticloadbalancing:DeleteRule
-            - elasticloadbalancing:ModifyRule
-            - elasticloadbalancing:SetRulePriorities
-            - elasticloadbalancing:SetSecurityGroups
-            - elasticloadbalancing:SetSubnets
-            - elasticloadbalancing:CreateTargetGroup
-            - elasticloadbalancing:DescribeTargetGroups
-            - elasticloadbalancing:DescribeTargetGroupAttributes
-            - elasticloadbalancing:ModifyTargetGroup
-            - elasticloadbalancing:ModifyTargetGroupAttributes
-            - elasticloadbalancing:DeleteTargetGroup
-            - elasticloadbalancing:DescribeSSLPolicies
-            - elasticloadbalancing:DescribeTags
-            - elasticloadbalancing:AddTags
-            - elasticloadbalancing:RemoveTags
-            - elasticloadbalancing:DescribeTargetHealth
+            - elasticloadbalancing:*
             Resource: '*'
             Effect: Allow
       - PolicyName: update-route53
@@ -317,49 +291,49 @@ Resources:
             - ssm:GetParameters
             Resource: '*'
             Effect: Allow
-          - Action:
-            - rds:DescribeDBClusterParameterGroups
-            - rds:DescribeDBClusterSnapshots
-            - rds:DescribeDBClusters
-            - rds:DescribeDBInstances
-            - rds:DescribeDBInstanceReadReplicas
-            - rds:DescribeDBParameterGroups
-            - rds:DescribeDBSecurityGroups
-            - rds:DescribeDBSnapshots
-            - rds:DescribeDBSubnetGroups
-            - rds:CreateOptionGroups
-            - rds:CreateDBClusterParameterGroup
-            - rds:CreateDBClusterSnapshot
-            - rds:CreateDBCluster
-            - rds:CreateDBInstance
-            - rds:CreateDBInstanceReadReplica
-            - rds:CreateDBParameterGroup
-            - rds:CreateDBSecurityGroup
-            - rds:CreateDBSnapshot
-            - rds:CreateDBSubnetGroup
-            - rds:CreateOptionGroup
-            - rds:ModifyDBClusterParameterGroup
-            - rds:ModifyDBCluster
-            - rds:ModifyDBInstance
-            - rds:ModifyDBParameterGroup
-            - rds:ModifyDBSnapshotAttribute
-            - rds:ModifyDBSubnetGroup
-            - rds:ModifyOptionGroup
-            - rds:DeleteDBParameterGroup
-            - rds:DeleteDBInstance
-            - rds:DeleteDBClusterParameterGroup
-            - rds:DeleteDBCluster
-            - rds:DeleteDBSecurityGroup
-            - rds:DeleteDBSnapshot
-            - rds:DeleteDBSubnetGroup
-            - rds:DeleteOptionGroup
-            - rds:AddTagsToResource
-            - rds:ListTagsToResource
-            - rds:RemoveTagsToResource
-            - rds:AuthorizeDBSecurityGroupIngress
-            - rds:RevokeDBSecurityGroupIngress
-            Resource: '*'
-            Effect: Allow
+#          - Action:
+#            - rds:DescribeDBClusterParameterGroups
+#            - rds:DescribeDBClusterSnapshots
+#            - rds:DescribeDBClusters
+#            - rds:DescribeDBInstances
+#            - rds:DescribeDBInstanceReadReplicas
+#            - rds:DescribeDBParameterGroups
+#            - rds:DescribeDBSecurityGroups
+#            - rds:DescribeDBSnapshots
+#            - rds:DescribeDBSubnetGroups
+#            - rds:CreateOptionGroups
+#            - rds:CreateDBClusterParameterGroup
+#            - rds:CreateDBClusterSnapshot
+#            - rds:CreateDBCluster
+#            - rds:CreateDBInstance
+#            - rds:CreateDBInstanceReadReplica
+#            - rds:CreateDBParameterGroup
+#            - rds:CreateDBSecurityGroup
+#            - rds:CreateDBSnapshot
+#            - rds:CreateDBSubnetGroup
+#            - rds:CreateOptionGroup
+#            - rds:ModifyDBClusterParameterGroup
+#            - rds:ModifyDBCluster
+#            - rds:ModifyDBInstance
+#            - rds:ModifyDBParameterGroup
+#            - rds:ModifyDBSnapshotAttribute
+#            - rds:ModifyDBSubnetGroup
+#            - rds:ModifyOptionGroup
+#            - rds:DeleteDBParameterGroup
+#            - rds:DeleteDBInstance
+#            - rds:DeleteDBClusterParameterGroup
+#            - rds:DeleteDBCluster
+#            - rds:DeleteDBSecurityGroup
+#            - rds:DeleteDBSnapshot
+#            - rds:DeleteDBSubnetGroup
+#            - rds:DeleteOptionGroup
+#            - rds:AddTagsToResource
+#            - rds:ListTagsToResource
+#            - rds:RemoveTagsToResource
+#            - rds:AuthorizeDBSecurityGroupIngress
+#            - rds:RevokeDBSecurityGroupIngress
+#            Resource: '*'
+#            Effect: Allow
       - PolicyName: service-linked-roles
         PolicyDocument:
           Version: '2012-10-17'
