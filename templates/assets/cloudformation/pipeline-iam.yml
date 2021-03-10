@@ -386,6 +386,8 @@ Resources:
             - ecr:ListTagsForResource
             - ecr:TagResource
             - ecr:UntagResource
+            - ecr:GetLifecyclePolicy
+            - ecr:GetLifecyclePolicyPreview
             Effect: Allow
             Resource: !Sub arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${Namespace}-${ServiceName}
           - Action:
